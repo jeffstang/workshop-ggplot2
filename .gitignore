@@ -1,0 +1,19 @@
+# Quarto
+/.quarto/
+/_site/
+*.html
+*.pdf
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# System files
+.DS_Store
+Thumbs.db
+
+# webr cache
+_webr/

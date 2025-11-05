@@ -1,0 +1,702 @@
+---
+title: "Introduction to ggplot2"
+subtitle: "Data Visualization for Health Sciences"
+author: "Workshop for Graduate Students"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    #embed-resources: true
+    slide-number: true
+    chalkboard: false
+    preview-links: auto
+    logo: ""
+    footer: "ggplot2 Workshop"
+    transition: slide
+    background-transition: fade
+    smaller: false
+    scrollable: true
+filters:
+  - webr
+webr:
+  packages: ['ggplot2', 'gapminder', 'dplyr', 'scales']
+  show-startup-message: false
+---
+
+## Welcome! 👋
+
+**Today's Workshop**
+
+- Learn data visualization using ggplot2 in R
+- No coding experience required!
+- Interactive exercises throughout
+- Ask questions anytime
+
+**Duration:** 45-50 minutes + 10-15 min Q&A
+
+---
+
+## Learning Objectives
+
+By the end of this workshop, you will be able to:
+
+::: {.incremental}
+- Understand the "grammar of graphics" concept
+- Create basic plots with ggplot2
+- Customize plot aesthetics (colors, sizes, shapes)
+- Layer multiple data representations
+- Create small multiples with faceting
+- Apply these skills to health sciences data
+:::
+
+---
+
+## What is ggplot2? 📊
+
+::: {.columns}
+::: {.column width="50%"}
+**A powerful visualization package**
+
+- Part of the tidyverse ecosystem
+- Based on "Grammar of Graphics"
+- Highly flexible and customizable
+- Industry standard for R visualizations
+:::
+
+::: {.column width="50%"}
+**Why ggplot2?**
+
+- Consistent syntax
+- Beautiful defaults
+- Publication-ready plots
+- Widely used in research
+:::
+:::
+
+---
+
+## Grammar of Graphics
+
+Think of building a plot like building a sentence:
+
+::: {.incremental}
+1. **Data**: What information to visualize?
+2. **Aesthetics**: What variables map to visual properties?
+3. **Geometries**: What shapes represent the data?
+4. **Facets**: Split into subplots?
+5. **Themes**: How should it look?
+:::
+
+---
+
+## Today's Dataset: Gapminder
+
+Health and economic data across countries and time
+
+**Variables we'll explore:**
+
+- `country`: Country name
+- `year`: Year (1952-2007)
+- `lifeExp`: Life expectancy at birth (years)
+- `pop`: Population
+- `gdpPercap`: GDP per capita (USD)
+- `continent`: Continent
+
+---
+
+## Let's Start Coding! 💻
+
+First, let's load our packages and data:
+
+```{webr-r}
+library(ggplot2)
+library(gapminder)
+library(dplyr)
+
+# Preview the data
+head(gapminder)
+```
+
+---
+
+## Explore the Data
+
+```{webr-r}
+# Check the structure
+str(gapminder)
+
+# Summary statistics
+summary(gapminder$lifeExp)
+summary(gapminder$gdpPercap)
+```
+
+---
+
+## Our First Plot: Scatter Plot
+
+Basic template:
+```r
+ggplot(data = DATA, aes(x = X_VAR, y = Y_VAR)) +
+  geom_point()
+```
+
+Let's plot life expectancy vs GDP per capita:
+
+```{webr-r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+---
+
+## Adding Color Aesthetic 🎨
+
+Color points by continent:
+
+```{webr-r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point()
+```
+
+**Notice:** Color is mapped to a variable (continent)
+
+---
+
+## Adjusting Point Size
+
+Make points bigger with `size`:
+
+```{webr-r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(size = 3)
+```
+
+**Fixed vs. Mapped:**
+
+- Inside `aes()`: mapped to data
+- Outside `aes()`: fixed for all points
+
+---
+
+## Mapping Size to Population
+
+```{webr-r}
+ggplot(data = gapminder, 
+       aes(x = gdpPercap, y = lifeExp, 
+           color = continent, size = pop)) +
+  geom_point(alpha = 0.6)
+```
+
+**New aesthetic:** `alpha` controls transparency (0-1)
+
+---
+
+## Your Turn! ✏️
+
+Try modifying the plot:
+
+```{webr-r}
+# Experiment with:
+# - Different variables on x or y axis
+# - Different colors or sizes
+# - Transparency (alpha)
+
+ggplot(data = gapminder, 
+       aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+---
+
+## Improving Our Plot
+
+Add better axis labels and title:
+
+```{webr-r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "Life Expectancy vs GDP Per Capita",
+    x = "GDP per Capita (USD)",
+    y = "Life Expectancy (years)",
+    color = "Continent"
+  )
+```
+
+---
+
+## Log Scale for GDP
+
+GDP is heavily skewed. Let's use log scale:
+
+```{webr-r}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(alpha = 0.6) +
+  scale_x_log10() +
+  labs(
+    title = "Life Expectancy vs GDP Per Capita (Log Scale)",
+    x = "GDP per Capita (USD, log scale)",
+    y = "Life Expectancy (years)"
+  )
+```
+
+---
+
+## Line Plots: Trends Over Time
+
+Filter data for one country:
+
+```{webr-r}
+canada_data <- gapminder %>% 
+  filter(country == "Canada")
+
+ggplot(canada_data, aes(x = year, y = lifeExp)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Life Expectancy in Canada Over Time")
+```
+
+---
+
+## Multiple Countries
+
+```{webr-r}
+# Select a few countries
+countries_data <- gapminder %>% 
+  filter(country %in% c("Canada", "United States", "Mexico", "Cuba"))
+
+ggplot(countries_data, aes(x = year, y = lifeExp, color = country)) +
+  geom_line(linewidth = 1) +
+  geom_point() +
+  labs(title = "Life Expectancy Trends in North America")
+```
+
+---
+
+## Layering Multiple Geoms
+
+Combining different geometries:
+
+```{webr-r}
+ggplot(countries_data, aes(x = year, y = lifeExp, color = country)) +
+  geom_line(linewidth = 1.2) +  # Lines
+  geom_point(size = 3) +         # Points
+  labs(
+    title = "Life Expectancy Over Time",
+    x = "Year",
+    y = "Life Expectancy (years)"
+  )
+```
+
+---
+
+## Bar Plots: Categorical Data
+
+Average life expectancy by continent (2007):
+
+```{webr-r}
+gapminder_2007 <- gapminder %>% 
+  filter(year == 2007) %>% 
+  group_by(continent) %>% 
+  summarize(avg_lifeExp = mean(lifeExp))
+
+ggplot(gapminder_2007, aes(x = continent, y = avg_lifeExp)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = "Average Life Expectancy by Continent (2007)",
+    y = "Average Life Expectancy (years)"
+  )
+```
+
+---
+
+## Adding Color to Bars
+
+```{webr-r}
+ggplot(gapminder_2007, aes(x = continent, y = avg_lifeExp, fill = continent)) +
+  geom_col() +
+  labs(
+    title = "Average Life Expectancy by Continent (2007)",
+    y = "Average Life Expectancy (years)"
+  ) +
+  theme(legend.position = "none")  # Remove redundant legend
+```
+
+---
+
+## Box Plots: Distribution
+
+Life expectancy distribution by continent:
+
+```{webr-r}
+gapminder_2007_full <- gapminder %>% 
+  filter(year == 2007)
+
+ggplot(gapminder_2007_full, aes(x = continent, y = lifeExp, fill = continent)) +
+  geom_boxplot() +
+  labs(
+    title = "Life Expectancy Distribution by Continent (2007)",
+    y = "Life Expectancy (years)"
+  )
+```
+
+---
+
+## Your Turn! ✏️
+
+Create a plot showing GDP trends:
+
+```{webr-r}
+# Filter for countries of your choice
+# Plot gdpPercap over time
+# Try different geoms: geom_line(), geom_point(), both?
+
+my_countries <- gapminder %>% 
+  filter(country %in% c("China", "India", "Japan"))
+
+# Your code here:
+ggplot(my_countries, aes(x = year, y = gdpPercap, color = country)) +
+  geom_line()
+```
+
+---
+
+## Faceting: Small Multiples
+
+Split plot by continent:
+
+```{webr-r}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(alpha = 0.6) +
+  scale_x_log10() +
+  facet_wrap(~continent) +
+  labs(
+    title = "Life Expectancy vs GDP by Continent",
+    x = "GDP per Capita (USD, log scale)",
+    y = "Life Expectancy (years)"
+  ) +
+  theme(legend.position = "none")
+```
+
+---
+
+## Facet Grid: Two Variables
+
+Facet by continent and year (subset):
+
+```{webr-r}
+gapminder_subset <- gapminder %>% 
+  filter(year %in% c(1952, 1977, 2002))
+
+ggplot(gapminder_subset, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(alpha = 0.7) +
+  scale_x_log10() +
+  facet_grid(year ~ continent) +
+  theme(legend.position = "none")
+```
+
+---
+
+## Facet Wrap vs Facet Grid
+
+**facet_wrap(~variable)**
+
+- Creates a ribbon of panels
+- Best for one categorical variable
+- Flexible layout
+
+**facet_grid(row_var ~ col_var)**
+
+- Creates a matrix of panels
+- Best for two categorical variables
+- Aligned axes for comparison
+
+---
+
+## Combining Everything 🎯
+
+A comprehensive visualization:
+
+```{webr-r}
+gapminder_recent <- gapminder %>% 
+  filter(year >= 1987)
+
+ggplot(gapminder_recent, 
+       aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.5) +
+  scale_x_log10() +
+  facet_wrap(~year) +
+  labs(
+    title = "Global Health and Wealth (1987-2007)",
+    x = "GDP per Capita (USD, log scale)",
+    y = "Life Expectancy (years)",
+    size = "Population",
+    color = "Continent"
+  )
+```
+
+---
+
+## Themes: Changing Appearance
+
+ggplot2 comes with built-in themes:
+
+```{webr-r}
+p <- ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_x_log10()
+
+# Try different themes:
+p + theme_minimal() + labs(title = "theme_minimal()")
+```
+
+---
+
+## More Themes
+
+```{webr-r}
+# Classic theme
+p + theme_classic() + labs(title = "theme_classic()")
+```
+
+```{webr-r}
+# Black and white
+p + theme_bw() + labs(title = "theme_bw()")
+```
+
+---
+
+## Customizing Themes
+
+Fine-tune specific elements:
+
+```{webr-r}
+ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_x_log10() +
+  labs(
+    title = "Life Expectancy vs GDP (2007)",
+    x = "GDP per Capita (USD, log scale)",
+    y = "Life Expectancy (years)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 18, face = "bold"),
+    axis.title = element_text(size = 14),
+    legend.position = "bottom"
+  )
+```
+
+---
+
+## Health Sciences Application 🏥
+
+Imagine you're analyzing patient outcomes:
+
+```{webr-r}
+# Life expectancy could represent health outcomes
+# GDP could represent healthcare spending
+# Population could represent sample size
+# Year could represent different cohorts
+
+ggplot(gapminder, aes(x = year, y = lifeExp, group = country, color = continent)) +
+  geom_line(alpha = 0.3) +
+  facet_wrap(~continent) +
+  labs(
+    title = "Health Outcomes Over Time (Analog)",
+    x = "Time Period",
+    y = "Health Outcome Score"
+  ) +
+  theme_minimal()
+```
+
+---
+
+## Practice Exercise 📝
+
+Create a visualization to answer:
+
+**"How has population changed across continents?"**
+
+```{webr-r}
+# Hints:
+# - Use gapminder dataset
+# - Consider geom_line() or geom_area()
+# - Think about faceting
+# - Add appropriate labels
+
+# Your code here:
+
+```
+
+---
+
+## Solution: Population Trends
+
+```{webr-r}
+pop_by_continent <- gapminder %>% 
+  group_by(continent, year) %>% 
+  summarize(total_pop = sum(pop), .groups = "drop")
+
+ggplot(pop_by_continent, aes(x = year, y = total_pop, color = continent)) +
+  geom_line(linewidth = 1.5) +
+  geom_point(size = 2) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-9, suffix = "B")) +
+  labs(
+    title = "Population Growth by Continent",
+    x = "Year",
+    y = "Total Population (Billions)",
+    color = "Continent"
+  ) +
+  theme_minimal()
+```
+
+---
+
+## Common Geoms Summary
+
+| Geom | Use Case | Example |
+|------|----------|---------|
+| `geom_point()` | Scatter plots | Relationship between two continuous variables |
+| `geom_line()` | Line plots | Trends over time |
+| `geom_col()` / `geom_bar()` | Bar plots | Categorical comparisons |
+| `geom_boxplot()` | Box plots | Distribution by category |
+| `geom_histogram()` | Histograms | Distribution of one variable |
+| `geom_smooth()` | Trend lines | Add fitted curves |
+
+---
+
+## Aesthetics Summary
+
+**Common aesthetic mappings:**
+
+- `x`, `y`: Position on axes
+- `color`: Color of points/lines
+- `fill`: Fill color (for bars, areas)
+- `size`: Size of points/lines
+- `alpha`: Transparency (0-1)
+- `shape`: Shape of points
+- `linetype`: Type of line
+
+---
+
+## Key Takeaways 🎓
+
+::: {.incremental}
+1. **ggplot2 uses layers**: Start with data + aesthetics, add geoms
+2. **Aesthetics map data to visuals**: Inside `aes()` for mapping
+3. **Geoms define visualization type**: points, lines, bars, etc.
+4. **Faceting creates small multiples**: Compare across categories
+5. **Customization is powerful**: themes, labels, scales
+6. **Practice makes perfect**: Experiment with your own data!
+:::
+
+---
+
+## Resources 📚
+
+**Learn More:**
+
+- [ggplot2 documentation](https://ggplot2.tidyverse.org/)
+- [R for Data Science (free online book)](https://r4ds.hadley.nz/)
+- [ggplot2 cheat sheet](https://rstudio.github.io/cheatsheets/data-visualization.pdf)
+- [Data Visualization with ggplot2 (Posit)](https://posit.cloud/learn/primers/3)
+
+**Practice:**
+
+- [TidyTuesday](https://github.com/rfordatascience/tidytuesday) - Weekly data viz challenges
+- [Gapminder](https://www.gapminder.org/) - Explore more global health data
+
+---
+
+## Next Steps 🚀
+
+**To continue learning:**
+
+1. Try ggplot2 with your own datasets
+2. Explore extensions: `ggplotly` (interactive), `patchwork` (combining plots)
+3. Learn data wrangling with `dplyr`
+4. Join R communities (R-Ladies, local R user groups)
+5. Practice, practice, practice!
+
+---
+
+## Final Practice ✏️
+
+Create your own visualization!
+
+```{webr-r}
+# Choose:
+# - Variables to plot
+# - Geom(s) to use
+# - Aesthetics to map
+# - Whether to facet
+# - Theme and labels
+
+# Make it publication-ready!
+
+```
+
+---
+
+## Questions? 🙋
+
+**We have 10-15 minutes for:**
+
+- Questions about concepts
+- Help with code
+- Discussion of your use cases
+- Additional examples
+
+**Thank you for participating!** 🎉
+
+---
+
+## Bonus: Saving Your Plots
+
+```{webr-r}
+# Create a plot
+my_plot <- ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_x_log10() +
+  theme_minimal()
+
+# Save it (in regular R, not webR)
+# ggsave("my_plot.png", my_plot, width = 10, height = 6, dpi = 300)
+```
+
+**Note:** In webR (browser), use right-click to save plots. In regular R, use `ggsave()`.
+
+---
+
+## Bonus: Adding Trend Lines
+
+```{webr-r}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.3, color = "gray50") +
+  geom_smooth(method = "lm", color = "blue", se = TRUE) +
+  scale_x_log10() +
+  labs(
+    title = "Life Expectancy vs GDP with Trend Line",
+    x = "GDP per Capita (USD, log scale)",
+    y = "Life Expectancy (years)"
+  ) +
+  theme_minimal()
+```
+
+---
+
+## Bonus: Violin Plots
+
+Alternative to box plots showing distribution:
+
+```{webr-r}
+ggplot(gapminder_2007_full, aes(x = continent, y = lifeExp, fill = continent)) +
+  geom_violin(alpha = 0.7) +
+  geom_boxplot(width = 0.2, alpha = 0.5) +
+  labs(
+    title = "Life Expectancy Distribution by Continent (2007)",
+    y = "Life Expectancy (years)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```

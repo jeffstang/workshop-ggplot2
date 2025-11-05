@@ -1,0 +1,59 @@
+/*-- scss:defaults --*/
+
+// Colors
+$primary-color: #2C3E50;
+$secondary-color: #3498DB;
+$accent-color: #E74C3C;
+
+// Fonts
+$font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$presentation-heading-color: $primary-color;
+
+/*-- scss:rules --*/
+
+.reveal {
+  font-size: 32px;
+}
+
+.reveal h2 {
+  color: $primary-color;
+  margin-bottom: 0.5em;
+}
+
+.reveal h3 {
+  color: $secondary-color;
+}
+
+.reveal code {
+  background-color: #f4f4f4;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.reveal pre code {
+  background-color: #2d2d2d;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.reveal .slide table {
+  font-size: 0.8em;
+}
+
+// Incremental lists
+.reveal .incremental li {
+  margin-bottom: 0.3em;
+}
+
+// Code blocks
+.reveal .sourceCode {
+  font-size: 0.75em;
+}
+
+// Emphasis boxes
+.reveal .callout {
+  margin: 1em 0;
+  padding: 1em;
+  border-left: 5px solid $secondary-color;
+  background-color: #f8f9fa;
+}
