@@ -1,11 +1,7 @@
 ---
-title: "Introduction to ggplot2"
-subtitle: "Data Visualization for Health Sciences"
-author: "Workshop for Graduate Students"
 format:
   revealjs:
     theme: [default, custom.scss]
-    #embed-resources: true
     slide-number: true
     chalkboard: false
     preview-links: auto
@@ -18,8 +14,25 @@ format:
 filters:
   - webr
 webr:
-  packages: ['ggplot2', 'gapminder', 'dplyr', 'scales']
+  packages: ['ggplot2', 'gapminder', 'dplyr', 'scales']       
   show-startup-message: false
+---
+
+## 
+
+::: {style="text-align: center; margin-top: 30px;"}
+### Data Visualization with ggplot2
+
+# UBC Bioinformatics and Statistics Workshop Series
+
+Presenter: Jeffrey Tang
+
+November 5, 2025
+
+Contact: jeffrey.tang@hli.ubc.ca
+
+![](images/ubc_acknowledgements.png){width="250px"}
+:::
 ---
 
 ## Welcome! 👋
@@ -31,21 +44,19 @@ webr:
 - Interactive exercises throughout
 - Ask questions anytime
 
-**Duration:** 45-50 minutes + 10-15 min Q&A
-
 ---
 
 ## Learning Objectives
 
 By the end of this workshop, you will be able to:
 
-::: {.incremental}
+::: {.nonincremental}
+
 - Understand the "grammar of graphics" concept
 - Create basic plots with ggplot2
 - Customize plot aesthetics (colors, sizes, shapes)
 - Layer multiple data representations
 - Create small multiples with faceting
-- Apply these skills to health sciences data
 :::
 
 ---
@@ -57,9 +68,8 @@ By the end of this workshop, you will be able to:
 **A powerful visualization package**
 
 - Part of the tidyverse ecosystem
-- Based on "Grammar of Graphics"
 - Highly flexible and customizable
-- Industry standard for R visualizations
+- Gold standard data viz tool
 :::
 
 ::: {.column width="50%"}
@@ -67,8 +77,8 @@ By the end of this workshop, you will be able to:
 
 - Consistent syntax
 - Beautiful defaults
-- Publication-ready plots
-- Widely used in research
+- "Publication-ready" reproducible plots
+- Widely used in academia
 :::
 :::
 
@@ -78,12 +88,13 @@ By the end of this workshop, you will be able to:
 
 Think of building a plot like building a sentence:
 
-::: {.incremental}
+::: {.nonincremental}
 1. **Data**: What information to visualize?
 2. **Aesthetics**: What variables map to visual properties?
 3. **Geometries**: What shapes represent the data?
-4. **Facets**: Split into subplots?
-5. **Themes**: How should it look?
+4. **Scales and Transformations**: Is what I'm showing 
+5. **Facets**: Split into subplots?
+6. **Themes**: How should the visual of the plot look?
 :::
 
 ---
@@ -133,9 +144,9 @@ summary(gapminder$gdpPercap)
 
 ## Our First Plot: Scatter Plot
 
-Basic template:
+Minimal basic template:
 ```r
-ggplot(data = DATA, aes(x = X_VAR, y = Y_VAR)) +
+ggplot(data = INPUT_DATA, aes(x = INDEP_VAR, y = DEP_VAR)) +
   geom_point()
 ```
 
@@ -186,11 +197,11 @@ ggplot(data = gapminder,
   geom_point(alpha = 0.6)
 ```
 
-**New aesthetic:** `alpha` controls transparency (0-1)
+**New aesthetic:** `alpha` controls transparency (0-1) which could be useful for large data sets because of the number of clustered points...
 
 ---
 
-## Your Turn! ✏️
+## Your Turn! ✏️ (~2 mins)
 
 Try modifying the plot:
 
@@ -199,10 +210,12 @@ Try modifying the plot:
 # - Different variables on x or y axis
 # - Different colors or sizes
 # - Transparency (alpha)
+# make sure to delete the argument if you don't want to run it
+# ie. remove size = ... if you just want to use default point size
 
 ggplot(data = gapminder, 
-       aes(x = gdpPercap, y = lifeExp)) +
-  geom_point()
+       aes(x = gdpPercap, y = lifeExp, colors = ...)) +
+  geom_point(size = ..., alpha = ...)
 ```
 
 ---
@@ -224,14 +237,15 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
 
 ---
 
-## Log Scale for GDP
+## Axis Transformation for GDP
 
-GDP is heavily skewed. Let's use log scale:
+We can scale the axis or transform to make it look better:
 
 ```{webr-r}
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
   geom_point(alpha = 0.6) +
   scale_x_log10() +
+  #scale_x_continuous(name="GDP", limits=c(0, 50000)) 
   labs(
     title = "Life Expectancy vs GDP Per Capita (Log Scale)",
     x = "GDP per Capita (USD, log scale)",
@@ -241,8 +255,8 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
 
 ---
 
-## Line Plots: Trends Over Time
-
+## Line Plots: Trends Over Time (minimum example)
+### What does the life expectancy look like in Canada over the years?
 Filter data for one country:
 
 ```{webr-r}
@@ -266,7 +280,6 @@ countries_data <- gapminder %>%
 
 ggplot(countries_data, aes(x = year, y = lifeExp, color = country)) +
   geom_line(linewidth = 1) +
-  geom_point() +
   labs(title = "Life Expectancy Trends in North America")
 ```
 
@@ -441,7 +454,7 @@ ggplot(gapminder_recent,
 ggplot2 comes with built-in themes:
 
 ```{webr-r}
-p <- ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+p <- ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
   geom_point(size = 3, alpha = 0.7) +
   scale_x_log10()
 
@@ -470,7 +483,7 @@ p + theme_bw() + labs(title = "theme_bw()")
 Fine-tune specific elements:
 
 ```{webr-r}
-ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+ggplot(gapminder_2007, aes(x = gdpPercap, y = lifeExp, color = continent)) +
   geom_point(size = 3, alpha = 0.7) +
   scale_x_log10() +
   labs(
@@ -490,13 +503,15 @@ ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) 
 
 ## Health Sciences Application 🏥
 
-Imagine you're analyzing patient outcomes:
+Can GDP, demographic, and time periods affect health outcomes like life expectancy?
+
+Making full use of various layers to tell the "full" story:
 
 ```{webr-r}
-# Life expectancy could represent health outcomes
-# GDP could represent healthcare spending
-# Population could represent sample size
-# Year could represent different cohorts
+# Life expectancy --> health outcomes
+# GDP --> healthcare spending
+# Population demographic could represent our sample sizes
+# Year could represent different cohorts of samples
 
 ggplot(gapminder, aes(x = year, y = lifeExp, group = country, color = continent)) +
   geom_line(alpha = 0.3) +
@@ -517,10 +532,11 @@ Create a visualization to answer:
 
 **"How has population changed across continents?"**
 
+
 ```{webr-r}
 # Hints:
 # - Use gapminder dataset
-# - Consider geom_line() or geom_area()
+# - Consider geom_line() or BONUS: geom_area()
 # - Think about faceting
 # - Add appropriate labels
 
@@ -587,7 +603,8 @@ ggplot(pop_by_continent, aes(x = year, y = total_pop, color = continent)) +
 3. **Geoms define visualization type**: points, lines, bars, etc.
 4. **Faceting creates small multiples**: Compare across categories
 5. **Customization is powerful**: themes, labels, scales
-6. **Practice makes perfect**: Experiment with your own data!
+6. **Add annotations**: axis labels, title, specific data point values
+7. **Practice makes perfect**: Experiment with your own data!
 :::
 
 ---
@@ -598,8 +615,10 @@ ggplot(pop_by_continent, aes(x = year, y = total_pop, color = continent)) +
 
 - [ggplot2 documentation](https://ggplot2.tidyverse.org/)
 - [R for Data Science (free online book)](https://r4ds.hadley.nz/)
-- [ggplot2 cheat sheet](https://rstudio.github.io/cheatsheets/data-visualization.pdf)
+- [ggplot2 cheatsheet](https://rstudio.github.io/cheatsheets/data-visualization.pdf)
 - [Data Visualization with ggplot2 (Posit)](https://posit.cloud/learn/primers/3)
+- [Jenny Brian's ggplot2 Tutorial](https://github.com/jennybc/ggplot2-tutorial)
+- [ggpubr](https://rpkgs.datanovia.com/ggpubr/)
 
 **Practice:**
 
@@ -612,17 +631,18 @@ ggplot(pop_by_continent, aes(x = year, y = total_pop, color = continent)) +
 
 **To continue learning:**
 
-1. Try ggplot2 with your own datasets
-2. Explore extensions: `ggplotly` (interactive), `patchwork` (combining plots)
+1. Try `ggplot2` with your own datasets
+2. Explore extensions: `ggplotly` (interactive), `patchwork` or `cowplot` (combining plots)
 3. Learn data wrangling with `dplyr`
-4. Join R communities (R-Ladies, local R user groups)
-5. Practice, practice, practice!
+4. Pick out (Journal-specific) colour palettes 
+5. Practice makes perfect!
+6. Check out more specific packages such as `pheatmap` or for more advanced usage `ComplexHeatmap` for heatmaps (`ggplot::geom_tile`), `EnhancedVolcano` for volcano plots for transcriptomics data
 
 ---
 
 ## Final Practice ✏️
 
-Create your own visualization!
+Create your own visualization with gapminder!
 
 ```{webr-r}
 # Choose:
@@ -640,8 +660,6 @@ Create your own visualization!
 
 ## Questions? 🙋
 
-**We have 10-15 minutes for:**
-
 - Questions about concepts
 - Help with code
 - Discussion of your use cases
@@ -655,7 +673,7 @@ Create your own visualization!
 
 ```{webr-r}
 # Create a plot
-my_plot <- ggplot(gapminder_2007_full, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+my_plot <- ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
   geom_point(size = 3, alpha = 0.7) +
   scale_x_log10() +
   theme_minimal()
@@ -690,7 +708,7 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
 Alternative to box plots showing distribution:
 
 ```{webr-r}
-ggplot(gapminder_2007_full, aes(x = continent, y = lifeExp, fill = continent)) +
+ggplot(gapminder, aes(x = continent, y = lifeExp, fill = continent)) +
   geom_violin(alpha = 0.7) +
   geom_boxplot(width = 0.2, alpha = 0.5) +
   labs(
