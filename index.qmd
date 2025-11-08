@@ -21,9 +21,9 @@ webr:
 ## 
 
 ::: {style="text-align: center; margin-top: 30px;"}
-### Data Visualization with ggplot2
+### UBC Bioinformatics and Statistics Workshop Series
 
-# UBC Bioinformatics and Statistics Workshop Series
+# Data Visualization with ggplot2
 
 Presenter: Jeffrey Tang
 
