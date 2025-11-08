@@ -4,7 +4,7 @@ An interactive workshop introducing ggplot2 data visualization to health science
 
 ## 📋 Overview
 
-This is a 45-50 minute presentation with 10-15 minutes for Q&A and interactive coding exercises. The workshop uses the gapminder dataset to demonstrate various ggplot2 capabilities including:
+This is a 40 minute presentation with 10-15 minutes for Q&A and interactive coding exercises. The workshop uses the gapminder dataset to demonstrate various ggplot2 capabilities including:
 
 - Different geoms (scatter plots, line plots, bar plots, box plots)
 - Aesthetics (color, size, shape, alpha)
